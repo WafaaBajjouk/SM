@@ -1,0 +1,150 @@
+# Exercise 3.2 Solution
+
+## Problem Statement
+
+In an exit poll of 1648 voters in the 2020 Senatorial election in Arizona, 51.5% said they voted for Mark Kelly, and 48.5% said they voted for Martha McSally.
+
+**1**: Suppose that actually 50% of the population voted for Kelly. If this exit poll had the properties of a simple random sample, find the standard error of the sample proportion voting for him.
+
+**2**: Under the 50% presumption, are the results of the exit poll surprising? Why? Would you be willing to predict the election outcome? Explain by (i) conducting a simulation; (ii) using the value found in (a) for the standard error.
+
+## Solution
+
+### a - Standard Error Calculation
+
+The standard error $SE$ of the sample proportion is calculated using:
+
+$$
+SE = \sqrt{\frac{p(1 - p)}{n}}
+$$
+
+And: - $p = 0.5$ (assumed proportion of voters for Kelly) - $n = 1648$ (sample size)
+
+```{r}
+p <- 0.5
+n <- 1648
+SE <- sqrt(p * (1 - p) / n)
+cat("Standard Error:", SE, "\n")
+```
+
+**Result:** The standard error is approximately **0.0123**.
+
+### b - Simulation Analysis
+
+```{r}
+set.seed(123)  
+simulations <- 10000
+sample_props <- rbinom(simulations, n, p) / n
+mean_sample_prop <- mean(sample_props)
+sd_sample_prop <- sd(sample_props)
+hist(sample_props, main = "Simulated Sampling Distribution of Proportion",
+     xlab = "Sample Proportion", breaks = 50, col = "lightblue")
+observed_prop <- 0.515
+is_surprising <- observed_prop > (mean_sample_prop + 2 * sd_sample_prop) || 
+                 observed_prop < (mean_sample_prop - 2 * sd_sample_prop)
+cat("Mean of Sample Proportions:", mean_sample_prop, "\n")
+cat("Standard Deviation of Sample Proportions:", sd_sample_prop, "\n")
+cat("Is the observed proportion surprising?:", is_surprising, "\n")
+```
+
+**Results:** - Mean of Sample Proportions: **0.5000** - Standard Deviation of Sample Proportions: **0.0123**
+
+The observed proportion of 51.5% is **not surprising**, as it falls within the expected range of the sampling distribution ($\pm 2$ standard deviations from the mean). It would be reasonable to predict that Kelly could win the election based on this exit poll, but with some caution due to the closeness of the result.
+
+# Exercise 3.16
+
+## Problem Statement
+
+According to the U.S. Census Bureau, the number of people in a household has a mean of 2.6 and a standard deviation of 1.5. Suppose the Census Bureau instead had estimated this mean using a random sample of 225 homes, and that sample had a mean of 2.4 and standard deviation of 1.4. Describe the center and spread of:
+
+1.  **a**: The population distribution.
+2.  **b**: The sample data distribution.
+3.  **c**: The sampling distribution of the sample mean for 225 homes.
+
+## Solution
+
+### a - Population Distribution
+
+$$
+\text{Mean: } \mu = 2.6
+$$ $$
+\text{Standard Deviation: } \sigma = 1.5
+$$
+
+### b - Sample Data Distribution
+
+$$
+\text{Sample Mean: } \bar{x} = 2.4
+$$ $$
+\text{Sample Standard Deviation: } s = 1.4
+$$
+
+### c - Sampling Distribution of the Sample Mean
+
+$$
+E(\bar{X}) = \mu = 2.6
+$$
+
+$$
+SE(\bar{X}) = \frac{\sigma}{\sqrt{n}}
+$$
+
+Where: $$
+\sigma = 1.5 \quad \text{(population standard deviation)}
+$$ $$
+n = 225 \quad \text{(sample size)}
+$$
+
+```{r}
+sigma <- 1.5
+n <- 225
+SE <- sigma / sqrt(n)
+cat("Standard Error of the Sample Mean:", SE, "\n")
+```
+
+**Results**: The standard error of the sample mean is approximately **0.1**.
+
+-   The **sampling distribution of the sample mean** the expected variability of the sample mean if we took multiple samples of 225 home and The standard error of 0.1 indicates that the sample mean is likely to be close to the population mean.
+
+# Exercise 3.24
+
+## Problem Statement
+
+Construct a population distribution that is plausible for $Y$ = number of alcoholic drinks in the past day.
+
+**a**: Simulate a single random sample of size $n = 1000$ from this population to reflect results of a typical sample survey. Summarize how the sample mean and standard deviation resemble those for the population.
+
+**b**: Draw 10,000 random samples of size $n = 1000$ each to approximate the sampling distribution of $Y$. Report the mean and standard deviation of this simulated sampling distribution, and compare to the theoretical values.
+
+## Solution
+
+### a - Single Sample Simulation
+
+```{r}
+set.seed(456)
+n_sample <- 1000
+population_distribution <- rpois(n_sample, lambda = 1.5)  
+sample_mean <- mean(population_distribution)
+sample_sd <- sd(population_distribution)
+hist(population_distribution, main = "Distribution of Number of Alcoholic Drinks",
+     xlab = "Number of Drinks", col = "lightgreen")
+cat("Sample Mean:", sample_mean, "\n")
+cat("Sample Standard Deviation:", sample_sd, "\n")
+```
+
+### b - Sampling Distribution Simulation
+
+```{r}
+set.seed(789)
+n_samples <- 10000
+sample_means <- replicate(n_samples, mean(rpois(n_sample, lambda = 1.5)))
+
+mean_sampling_distribution <- mean(sample_means)
+sd_sampling_distribution <- sd(sample_means)
+hist(sample_means, main = "Sampling Distribution of Sample Means",
+     xlab = "Sample Mean", col = "lightblue")
+cat("Mean of Sampling Distribution:", mean_sampling_distribution, "\n")
+cat("Standard Deviation of Sampling Distribution:", sd_sampling_distribution, "\n")
+```
+
+\`\`\`
