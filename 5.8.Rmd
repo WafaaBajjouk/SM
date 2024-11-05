@@ -1,0 +1,44 @@
+# Problem Statement
+
+Using the `Students` data file, analyze political ideology.
+
+-   **a**: Test whether the population mean $\mu$ differs from 4.0, the moderate response. Report the P-value and interpret the result, making a conclusion using $\alpha = 0.05$.
+-   **b**: Construct the 95% confidence interval for $\mu$. Explain how results relate to those of the test in (a).
+
+## Solution
+
+### Load Data
+
+```{r}
+library(dplyr)
+students_data <- read.table("Students.dat.txt", header = TRUE)
+head(students_data)
+```
+
+### a - Hypothesis Test for Mean Political Ideology
+
+```{r}
+# Null hypothesis ==== mean political ideology = 4.0
+# Alternative hypothesis = mean political ideology ≠ 4.0
+
+mean_ideol <- mean(students_data$ideol, na.rm = TRUE)
+sd_ideol <- sd(students_data$ideol, na.rm = TRUE)
+n_ideol <- sum(!is.na(students_data$ideol))
+t_test_result <- t.test(students_data$ideol, mu = 4.0, alternative = "two.sided")
+
+cat("P-value from the t-test:", t_test_result$p.value, "\n")
+```
+
+The P-value (2.48e-05) is much less than 0.05, indicating strong evidence to reject the null hypothesis. the population mean significantly differs from 4.0.
+
+### b - 95% Confidence Interval for Mean Political Ideology
+
+```{r}
+error_margin_ideol <- qt(0.975, df = n_ideol - 1) * (sd_ideol / sqrt(n_ideol))
+ci_lower_ideol <- mean_ideol - error_margin_ideol
+ci_upper_ideol <- mean_ideol + error_margin_ideol
+
+cat("95% Confidence Interval for mean political ideology: [", ci_lower_ideol, ",", ci_upper_ideol, "]\n")
+```
+
+The interval [2.61, 3.46] does not include 4.0, reinforcing and confirming the conclusion from the hypothesis test : the population mean differs from 4.0. The confidence interval [2.61, 3.46] does not include 4.0, confirming the hypothesis test result (P-value: 2.48e-05) that : mean significantly differs from 4.0. Both methods consistently indicate that the true mean is below 4.0.

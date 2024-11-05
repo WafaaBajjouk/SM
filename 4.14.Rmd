@@ -1,0 +1,58 @@
+# Exercise 4.14
+
+## Problem Statement
+
+Using the `Students` data file, construct a 95% confidence interval:
+
+-   **a**: For the mean weekly number of hours spent watching TV.
+-   **b**: To compare females and males on the mean weekly number of hours spent watching TV.
+
+## Solution
+
+### Load Data
+
+```{r}
+library(dplyr)
+students_data <- read.table("Students.dat.txt", header = TRUE)
+head(students_data)
+```
+
+### a - 95% Confidence Interval for Mean Weekly Hours Watching TV
+
+```{r}
+mean_tv <- mean(students_data$tv, na.rm = TRUE)
+sd_tv <- sd(students_data$tv, na.rm = TRUE)
+n_tv <- sum(!is.na(students_data$tv))
+
+error_margin <- qt(0.975, df = n_tv - 1) * (sd_tv / sqrt(n_tv))
+ci_lower <- mean_tv - error_margin
+ci_upper <- mean_tv + error_margin
+
+cat("95% Confidence Interval for mean weekly hours watching TV: [", ci_lower, ",", ci_upper, "]\n")
+```
+
+### b - Comparison of Mean Weekly Hours Watching TV Between Females and Males
+
+```{r}
+females <- students_data %>% filter(gender == 1) %>% select(tv) %>% unlist()
+males <- students_data %>% filter(gender == 0) %>% select(tv) %>% unlist()
+
+mean_female <- mean(females, na.rm = TRUE)
+sd_female <- sd(females, na.rm = TRUE)
+n_female <- sum(!is.na(females))
+
+mean_male <- mean(males, na.rm = TRUE)
+sd_male <- sd(males, na.rm = TRUE)
+n_male <- sum(!is.na(males))
+
+se_diff <- sqrt((sd_female^2 / n_female) + (sd_male^2 / n_male))
+mean_diff <- mean_female - mean_male
+
+error_margin_diff <- qt(0.975, df = min(n_female, n_male) - 1) * se_diff
+ci_lower_diff <- mean_diff - error_margin_diff
+ci_upper_diff <- mean_diff + error_margin_diff
+
+cat("95% Confidence Interval for the difference in mean weekly hours watching TV (Females - Males): [", ci_lower_diff, ",", ci_upper_diff, "]\n")
+```
+
+the 95% confidence interval for the difference in mean weekly hours spent watching TV between females and males is [-2.09, 5.06]. Since this interval includes zero, means that there may not be a significant difference between the two groups.

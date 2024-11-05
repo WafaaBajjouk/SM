@@ -1,4 +1,4 @@
-# Exercise 3.2 Solution
+# Exercise 3.2
 
 ## Problem Statement
 
@@ -146,5 +146,3 @@ hist(sample_means, main = "Sampling Distribution of Sample Means",
 cat("Mean of Sampling Distribution:", mean_sampling_distribution, "\n")
 cat("Standard Deviation of Sampling Distribution:", sd_sampling_distribution, "\n")
 ```
-
-\`\`\`
