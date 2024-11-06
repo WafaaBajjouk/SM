@@ -1,0 +1,990 @@
+---
+title: "GroupJ_HM1"
+author: "A. Nicic, G. Serafini, A. Valentini, M. Arab, W. Bajjouk"
+date: "2024-11-05"
+output:
+  html_document:
+    toc: true
+    toc_depth: '3'
+    df_print: paged
+  pdf_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## FSDS - Chapter 2
+
+### Ex 2.8
+
+*Each time a person shops at a grocery store, the event of catching a cold or some other virus* *from another shopper is independent from visit to visit and has a constant probability over the* *year, equal to 0.01.*
+
+(a) *In 100 trips to this store over the course of a year, the probability of catching a virus* *while shopping there is 100(0.01) = 1.0. What is wrong with this reasoning?*
+
+(b) *Find the correct probability in (a).*
+
+**Solution**
+
+(a) The reason this solution is flawed because it mistakenly assumes that probabilities add linearly across independent events. In reality, each visit to the store is an independent event with a probability of 0.01 of catching a virus. To calculate the probability of catching a virus at least once over 100 visits, we must account for the cumulative probability across independent events, which requires a different approach.
+
+(b) Solution:
+
+> 1.  Let p = 0.01 be the probability of catching a virus on a single visit
+
+> 2.  Let q = 1 - p = 0.99 be the probability of not catching a virus on a single visit
+
+> 3.  Let A be an event of not catching a virus over 100 visits. The probabiliy of event A occuring is: $$
+>     P(A) = q^{100} = 0.366
+>     $$
+
+> 4.  Let B be an event of catching a virus over 100 visits, which is the probability we are looking for. The event B is the complement of the event A which is: $$
+>     P(B) = 1 - P(A) = 0.634
+>     $$
+
+### Ex 2.16
+
+*Each day a hospital records the number of people who come to the emergency room for treatment.*
+
+(a) *In the first week, the observations from Sunday to Saturday are 10, 8, 14, 7, 21, 44, 60.* *Do you think that the Poisson distribution might describe the random variability of this* *phenomenon adequately. Why or why not?*
+
+(b) *Would you expect the Poisson distribution to better describe, or more poorly describe,* *the number of weekly admissions to the hospital for a rare disease? Why?*
+
+**Solution**
+
+(a) The Poisson distribution is often used to model the number of events occurring in a fixed period if these events happen independently and with a constant average rate. For the Poisson distribution to be a good fit, we generally assume:
+
+> 1.  Events occur independently (each patient arrival does not affect others).
+> 2.  Events occur at a constant average rate (the expected number of daily visits does not vary dramatically across days).
+> 3.  Rare Events: The occurrence of an event (e.g., a patient arriving) is relatively rare, and the count typically fluctuates around a smaller value.
+
+> In this case, the daily counts from Sunday to Saturday are 10,8,14,7,21,44,60.
+
+> The variation in these values is quite large, ranging from a minimum of 7 to a maximum of 60, suggesting that the average rate may not be constant across days. Such large fluctuations may indicate that factors like day of the week or seasonal effects influence the number of patients, violating the Poisson assumption of a constant rate. Additionally, the Poisson distribution typically does not handle such high variability well, as it tends to describe situations where counts are closer to the average.
+
+> Thus, the Poisson distribution may not describe the variability in daily emergency visits adequately due to the apparent non-constant rate and high variability.
+
+(b) For a rare disease, the weekly admissions to the hospital might be relatively low, and the counts might vary less drastically compared to daily emergency visits.
+
+> The Poisson distribution would likely better describe the weekly admissions for a rare disease because:
+
+> 1.  Low Count Rates: Poisson is a good fit for modeling low-frequency events, and admissions for rare diseases are likely to happen infrequently.
+> 2.  Consistency in Counts: With a small number of admissions, the count is less influenced by the day of the week or large variability, so a constant rate approximation might hold.
+> 3.  Independent Events: Admissions for rare diseases may generally occur independently, with little influence from one admission to the next.
+
+> In summary, the Poisson distribution is likely a better fit for modeling weekly admissions of a rare disease than it is for modeling daily emergency room visits, primarily because of the more stable, lower counts expected with rare diseases.
+
+### Ex 2.21
+
+*Plot the gamma distribution by fixing the shape parameter k = 3 and setting the scale parameter* *= 0.5, 1, 2, 3, 4, 5. What is the effect of increasing the scale parameter?*
+
+**Solution**
+
+To plot the Gamma distribution with a fixed shape parameter k=3 and varying scale parameters $\theta$ = 0.5, 1, 2, 3, 4, 5, we can use R's dgamma function. This function computes the density of the Gamma distribution, allowing us to create probability density function (PDF) plots for each scale parameter.
+
+```{r gamma-plot, echo=T}
+k <- 3
+x <- seq(0, 20, length.out = 200)
+scale_params <- c(0.5, 1, 2, 3, 4, 5)
+plot(x, dgamma(x, shape = k, scale = scale_params[1]), type = "n",
+     xlab = "x", ylab = "Density",
+     main = "Gamma Distribution with shape = 3 and varying scale parameters")
+colors <- rainbow(length(scale_params))  
+for (i in seq_along(scale_params)) {
+  lines(x, dgamma(x, shape = k, scale = scale_params[i]), col = colors[i], lwd = 2)
+}
+legend("topright", legend = paste("scale =", scale_params), col = colors, lwd = 2)
+```
+
+In summary, increasing the scale parameter $\theta$:
+
+1.  Increases the spread of the distribution (making it more variable).
+2.  Shifts the distribution’s mean to a higher value.
+3.  Stretches the distribution horizontally, affecting the skewness if k is small.
+
+The scale parameter, therefore, directly impacts both the location and variability of the Gamma-distributed data.
+
+### Ex 2.26
+
+*Refer to Table 2.4 cross classifying happiness with family income.*
+
+1.  *Find and interpret the correlation using scores (i) (1, 2, 3) for each variable, (ii) (1, 2, 3) for family income and (1, 4, 5) for happiness.*
+2.  *Construct the joint distribution that has these marginal distributions and exhibits independence of* $X$ and $Y$.
+
+| Income $\backslash$ Happiness | Not too happy | Pretty happy | Very happy | Total |
+|-------------------|-------------:|-------------:|-------------:|-------------:|
+| **Below average**             |         0.080 |        0.198 |      0.079 | 0.357 |
+| **Average**                   |         0.043 |        0.254 |      0.143 | 0.440 |
+| **Above average**             |         0.017 |        0.105 |      0.081 | 0.203 |
+| **Total**                     |         0.140 |        0.557 |      0.303 | 1.000 |
+
+*TABLE 2.4* Sample joint distribution of happiness by family income, with marginal distributions shown by the row and column totals.
+
+**Solution**
+
+-   *Part 1*:
+
+Let $X$ represent the scores for family income and let $Y$ represent the scores for happiness. The correlation coefficient $\rho$ is defined as:
+
+$$\rho = \frac{Cov(X,Y)}{\sigma_X \sigma_Y}$$ where $Cov(X,Y)$ is the covariance between $X$ and $Y$, and $\sigma_X$ and $\sigma_Y$ are the standard deviations of $X$ and $Y$, respectively.
+
+The covariance is calculated as:
+
+$$Cov(X,Y) = \sum_{i,j}(x_i - \mu_X)(y_j - \mu_Y)P(X = x_i, Y = y_j)$$ where $x_i$ and $y_j$ are the scores for each level of $X$ and $Y$, and $P(X = x_i, Y = y_j)$ is the joint probability for each combination of $X$ and $Y$.
+
+```{r echo=FALSE}
+joint_prob <- matrix(c(0.080, 0.198, 0.079,
+                       0.043, 0.254, 0.143,
+                       0.017, 0.105, 0.081),
+                     nrow = 3, byrow = T)
+
+income_scores <- c(1, 2, 3)
+happiness_scores_i <- c(1, 2, 3)
+happiness_scores_ii <- c(1, 4, 5)
+
+marginal_income <- rowSums(joint_prob)
+marginal_happiness <- colSums(joint_prob)
+
+mu_X <- sum(income_scores * marginal_income)
+sigma_X <- sqrt(sum((income_scores - mu_X)^2 * marginal_income))
+
+mu_Y_i <- sum(happiness_scores_i * marginal_happiness)
+sigma_Y_i <- sqrt(sum((happiness_scores_i - mu_Y_i)^2 * marginal_happiness))
+
+mu_Y_ii <- sum(happiness_scores_ii * marginal_happiness)
+sigma_Y_ii <- sqrt(sum((happiness_scores_ii - mu_Y_ii)^2 * marginal_happiness))
+
+cov_i <- sum(outer(income_scores - mu_X, happiness_scores_i - mu_Y_i) * joint_prob)
+cov_ii <- sum(outer(income_scores - mu_X, happiness_scores_ii - mu_Y_ii) * joint_prob)
+
+corr_i <- cov_i / (sigma_X * sigma_Y_i)
+corr_ii <- cov_ii / (sigma_X * sigma_Y_ii)
+
+cat("The correlation for (i) is ρ:", corr_i, "\n")
+cat("The correlation for (ii) is ρ:", corr_ii, "\n")
+```
+
+As we can see, there is a slight positive correlation between the two variables, which decreases slightly in the second case.
+
+-   *Part 2*:
+
+To construct the joint distribution, we have to multiply the marginal probability of each level of $X$ by each level of $Y$ to get $P(X = x_i, Y = y_j)$. Under the assumption of independence, we know that:
+
+$$P(X = x, Y = y) = P_X(X = x) \cdot P_Y(Y = y)$$
+
+For example, for the first row:
+
+```{r echo=FALSE}
+X1 <- marginal_income[1]
+Y1 <- marginal_happiness[1]
+Y2 <- marginal_happiness[2]
+Y3 <- marginal_happiness[3]
+
+p1 <- X1 * Y1
+p2 <- X1 * Y2
+p3 <- X1 * Y3
+
+cat("P(x_1, y_1) =", p1, "\n")
+cat("P(x_1, y_2) =", p2, "\n")
+cat("P(x_1, y_3) =", p3, "\n")
+```
+
+And following this procedure we can obtain the whole matrix:
+
+```{r echo=FALSE}
+P_X <- marginal_income
+P_Y <- marginal_happiness
+
+independent_joint_probs <- outer(P_X, P_Y)
+
+rownames(independent_joint_probs) <- c("Below average", "Average", "Above average")
+colnames(independent_joint_probs) <- c("Not too happy", "Pretty happy", "Very happy")
+
+independent_joint_probs
+```
+
+### Ex 2.52
+
+*The p.d.f.* $f$ of a $N(\mu, \sigma^2)$ distribution can be derived from the standard normal p.d.f. $$\phi(z) = \frac{1}{\sqrt{2\pi}}\exp(-\frac{z^2}{2})$$
+
+a)  *Show that the normal c.d.f.* $F$ relates to the standard normal c.d.f. $\Phi$ by $F(y) = \Phi (\frac{y − \mu}{\sigma})$.
+b)  *From (a), show that* $f(y) = \frac{1}{\sigma} \Phi (\frac{y − \mu}{\sigma})$, and show this is equation (2.8).
+
+**Solution**
+
+-   *Part a*:
+
+Let $Y \sim N(\mu, \sigma^2)$, we can standardize it by transforming it into a standard normal variable $Z$:
+
+$$Z = \frac{Y - \mu}{\sigma}$$
+
+We know that $F(y) = P(Y \leq y)$, so
+
+$$F(y) = P(Y \leq y) = P(\frac{Y - \mu}{\sigma} \leq \frac{y - \mu}{\sigma})$$
+
+Since $Z = \frac{Y - \mu}{\sigma} \sim N(0, 1)$, we can rewrite the probability in terms of the standard normal c.d.f. $\Phi(z)$:
+
+$$F(y) = P(Z \leq \frac{y - \mu}{\sigma}) = \Phi(\frac{y - \mu}{\sigma})$$
+
+So,
+
+$$F(y) = \Phi(\frac{y - \mu}{\sigma})$$
+
+-   *Part b*:
+
+The probability density function (p.d.f.) $f(y)$ of a normal random variable $Y \sim N(\mu, \sigma^2)$ can be derived by differentiating its cumulative distribution function $F(y)$ with respect to $y$.
+
+From (a) we know that $F(y) = \Phi(\frac{y - \mu}{\sigma})$. We can differentiate both sides of this equation with respect to $y$:
+
+$$f(y) = \frac{d}{dy}F(y) = \frac{d}{dy}\Phi(\frac{y - \mu}{\sigma})$$
+
+So, we get:
+
+$$f(y) = \Phi^{'}(\frac{y - \mu}{\sigma}) \cdot \frac{d}{dy}(\frac{y - \mu}{\sigma})$$
+
+By definition $\Phi^{'}(z) = \phi(z)$, and we therefore obtain:
+
+$$f(y) = \frac{1}{\sigma} \cdot \phi(\frac{y - \mu}{\sigma})$$
+
+This is the p.d.f. of a normal distribution with mean $\mu$ and variance $\sigma^2$, and, as shown in *equation 2.8*, it can be written as:
+
+$$f(y) = \frac{1}{\sqrt{2\pi\sigma^2}}\exp\Big(-\frac{(y - \mu)^2}{2\sigma^2}\Big)$$
+
+### Ex 2.53
+
+*If* $Y$ is a standard normal random variable, with c.d.f. $\Phi$, what is the probability distribution of $X = \Phi(Y)$? Illustrate by randomly generating a million standard normal random variables, applying the c.d.f. function $\Phi()$ to each, and plotting histograms of the (**a**) $y$ values, (**b**) $x$ values.
+
+**Solution**
+
+Let $Y \sim N(0, 1)$ with c.d.f. $\Phi$, then $X = \Phi(Y)$ transforms $Y$ using the cumulative distribution function of the standard normal distribution. This transformation maps the standard normal variable $Y$ to the interval $[0,1]$ because $\Phi(Y)$ is the probability that a standard normal variable is less than or equal to $Y$. For this reason, $X$ represents a probability value between $0$ and $1$.
+
+Since $\Phi(Y)$ is the c.d.f. of a standard normal distribution, the distribution of $X$ will be uniform over $[0,1]$. In fact, if $Y$ is a continuous random variable with c.d.f. $F$, then $F(Y)$ is uniformly distributed on $[0,1]$:
+
+$$G(x) = P(X \leq x) = P[F(Y) \leq x] = P[Y \leq F^{-1}(x)] = F[F^{-1}(x)] = x$$ As we know, $G(x) = x$ is the c.d.f. of a uniform random variable over the interval $[0,1]$.
+
+<!-- You may want to cite the probability integral transform theorem -->
+
+```{r}
+set.seed(123)
+
+n <- 1000000
+y_values <- rnorm(n)
+x_values <- pnorm(y_values)
+```
+
+```{r echo=FALSE}
+par(mfrow = c(1, 2))
+
+# Histogram of Y values
+hist(y_values, breaks = 40, probability = TRUE, main = "Histogram of Y (Standard Normal)",
+     xlab = "Y", col = "skyblue", border = "white")
+curve(dnorm(x), add = TRUE, col = "darkblue", lwd = 2)
+
+# Histogram of X values
+hist(x_values, breaks = 40, probability = TRUE, main = "Histogram of X = Φ(Y) (Uniform[0,1])",
+     xlab = "X", col = "salmon", border = "white")
+abline(h = 1, col = "darkred", lwd = 2)  # Add a line at height 1 for the Uniform(0,1) distribution
+```
+
+### Ex 2.70
+
+*The beta distribution is a probability distribution over* $(0, 1)$ that is often used for random variables that are proportions. The beta PDF is given by:
+
+$$
+f(y; \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1 - y)^{\beta - 1}, \quad 0 \leq y \leq 1
+$$
+
+*for parameters* $\alpha$ and $\beta$, where $\Gamma(\cdot)$ denotes the gamma function.
+
+(a) *Show that the uniform distribution is a special case with* $\alpha = \beta = 1$.
+
+(b) *Show that* $\mu = E(Y) = \frac{\alpha}{\alpha + \beta}$.
+
+(c) *Find* $E(Y^2)$. Show that $\text{var}(Y) = \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)} = \mu (1 - \mu) / (\alpha + \beta + 1)$. *For fixed* $\alpha + \beta$, *note that* $\text{var}(Y)$ *decreases as* $\mu$ *approaches 0 or 1.*
+
+(d) *Using a function such as `dbeta` in R, plot the beta PDF for:* *(i)* $\alpha = \beta = 0.5, 1.0, 10, 100$ *(ii) some values of* $\alpha > \beta$ and some values of $\alpha < \beta$.
+
+**Solution**
+
+(a) The beta distribution is given by the probability density function: $$
+    f(y; \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1 - y)^{\beta - 1}, \quad 0 \leq y \leq 1
+    $$
+
+> Where $\Gamma$ is the gamma function.
+
+> When $\alpha$ = 1 and $\beta$ = 1, this expression simplifies as follows: $$
+> f(y; 1, 1) = \frac{\Gamma(1 + 1)}{\Gamma(1) \Gamma(1)} y^{1 - 1} (1 - y)^{1 - 1}
+> $$
+
+> Since $\Gamma$ (2) = 1! = 1 and $\Gamma$ (1) = 1, we have: $$
+> f(y; 1, 1) = \frac{1}{1 \cdot 1} \cdot y^{0} \cdot (1 - y)^{0} = 1
+> $$
+
+> Thus, *f(y;1,1) = 1* for 0 $\leq$ y $\leq$ 1, which is the PDF of a uniform distribution on (0,1). Therefore, the uniform distribution is a special case of the beta distribution with $\alpha$ = 1 and $\beta$ = 1.
+
+(b) To find the mean value $E(Y)$, we calculate:
+
+$$
+E(Y) = \int_0^1 y f(y; \alpha, \beta) \, dy
+$$
+
+> Substituting the probability density function $f(y; \alpha, \beta)$:
+>
+> $$
+> E(Y) = \int_0^1 y \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1 - y)^{\beta - 1} \, dy
+> $$
+
+> Simplify by combining terms involving *y*: $$
+> E(Y) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} \int_0^1 y^{\alpha} (1 - y)^{\beta - 1} \, dy
+> $$
+
+> Notice that the integral above resembles the form of the Beta function:
+>
+> $$
+> B(x, y) = \int_0^1 t^{x-1} (1 - t)^{y-1} \, dt = \frac{\Gamma(x) \Gamma(y)}{\Gamma(x + y)}
+> $$
+
+> We can use this to evaluate the integral by recognizing that the integrand resembles the Beta distribution with parameters $\alpha + 1$ and $\beta$:
+>
+> $$
+> \int_0^1 y^{\alpha} (1 - y)^{\beta - 1} \, dy = \frac{\Gamma(\alpha + 1) \Gamma(\beta)}{\Gamma(\alpha + \beta + 1)}
+> $$
+
+> Substitute this result back: $$
+> E(Y) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} \cdot \frac{\Gamma(\alpha + 1) \Gamma(\beta)}{\Gamma(\alpha + \beta + 1)}
+> $$
+
+> Now, simplify using the property of the Gamma function $\Gamma$(x+1)=x$\Gamma$(x): $$
+> E(Y) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} \cdot \frac{\alpha \Gamma(\alpha) \Gamma(\beta)}{(\alpha + \beta) \Gamma(\alpha + \beta)}
+> $$
+
+> We can see that $\Gamma(\alpha)$, $\Gamma(\beta)$, and $\Gamma(\alpha + \beta)$ terms cancel:
+>
+> $$
+> E(Y) = \frac{\alpha}{\alpha + \beta}
+> $$
+
+> Thus, we have shown that:
+>
+> $$
+> \mu = E(Y) = \frac{\alpha}{\alpha + \beta}
+> $$
+
+(c) To find $E(Y^2)$ for the beta distribution $f(y; \alpha, \beta)$, we calculate:
+
+$$
+E(Y^2) = \int_0^1 y^2 f(y; \alpha, \beta) \, dy
+$$
+
+> Substituting the probability density function $f(y; \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1 - y)^{\beta - 1}$:
+
+> $$
+> E(Y^2) = \int_0^1 y^2 \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)} y^{\alpha - 1} (1 - y)^{\beta - 1} \, dy
+> $$
+
+> This integral has the form of the Beta function with parameters $\alpha + 2$ and $\beta$, so we can evaluate it using:
+
+> $$
+> \int_0^1 y^{\alpha + 1} (1 - y)^{\beta - 1} \, dy = \frac{\Gamma(\alpha + 2) \Gamma(\beta)}{\Gamma(\alpha + \beta + 2)}
+> $$
+
+> Thus,
+
+> $$
+> E(Y^2) = \frac{\Gamma(\alpha + 2) \Gamma(\beta)}{\Gamma(\alpha + \beta + 2)} \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha) \Gamma(\beta)}
+> $$
+
+> Simplifying this expression, we obtain:
+
+> $$
+> E(Y^2) = \frac{\alpha (\alpha + 1)}{(\alpha + \beta) (\alpha + \beta + 1)}
+> $$
+
+> Now, using the formula for variance, $\text{Var}(Y) = E(Y^2) - [E(Y)]^2$:
+
+> $$
+> \text{Var}(Y) = \frac{\alpha (\alpha + 1)}{(\alpha + \beta) (\alpha + \beta + 1)} - \left( \frac{\alpha}{\alpha + \beta} \right)^2
+> $$
+
+> Simplifying further, we get:
+
+> $$
+> \text{Var}(Y) = \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}
+> $$
+
+> Since, $\mu = E(Y) = \frac{\alpha}{\alpha + \beta}$ and $1 - \mu = \frac{\beta}{\alpha + \beta}$, we show that: $$
+> \text{Var}(Y) = \frac{\mu (1 - \mu)}{\alpha + \beta + 1}
+> $$
+
+(d) To visualize the impact of $\alpha$ and $\beta$ on the beta distribution, we can use the dbeta function in R to plot the PDF for different parameter values.
+
+```{r plots, echo=T}
+y_values <- seq(0, 1, length.out = 500)
+
+# (i) Plot for alpha = beta = 0.5, 1, 10, 100
+alpha_values <- c(0.5, 1, 10, 100)
+par(mfrow = c(2, 2)) 
+for (alpha in alpha_values) {
+  beta <- alpha  
+  plot(y_values, dbeta(y_values, alpha, beta), type = "l", lwd = 2, col = "blue",
+       main = paste("Beta PDF, alpha =", alpha, ", beta =", beta),
+       xlab = "y", ylab = "f(y)")
+}
+
+# (ii) Plot for some alpha > beta and some alpha < beta
+par(mfrow = c(2, 2))
+plot(y_values, dbeta(y_values, 2, 1), type = "l", lwd = 2, col = "red",
+     main = "Beta PDF, alpha = 2, beta = 1", xlab = "y", ylab = "f(y)")
+plot(y_values, dbeta(y_values, 5, 2), type = "l", lwd = 2, col = "red",
+     main = "Beta PDF, alpha = 5, beta = 2", xlab = "y", ylab = "f(y)")
+# Example: alpha < beta
+plot(y_values, dbeta(y_values, 1, 2), type = "l", lwd = 2, col = "green",
+     main = "Beta PDF, alpha = 1, beta = 2", xlab = "y", ylab = "f(y)")
+plot(y_values, dbeta(y_values, 2, 5), type = "l", lwd = 2, col = "green",
+     main = "Beta PDF, alpha = 2, beta = 5", xlab = "y", ylab = "f(y)")
+```
+
+## FSDS - Chapter 3
+
+### Exercise 3.2
+
+In an exit poll of 1648 voters in the 2020 Senatorial election in Arizona, 51.5% said they voted for Mark Kelly, and 48.5% said they voted for Martha McSally.
+
+**1**: Suppose that actually 50% of the population voted for Kelly. If this exit poll had the properties of a simple random sample, find the standard error of the sample proportion voting for him.
+
+**2**: Under the 50% presumption, are the results of the exit poll surprising? Why? Would you be willing to predict the election outcome? Explain by (i) conducting a simulation; (ii) using the value found in (a) for the standard error.
+
+*Solution*
+
+### a - Standard Error Calculation
+
+The standard error $SE$ of the sample proportion is calculated using:
+
+$$
+SE = \sqrt{\frac{p(1 - p)}{n}}
+$$
+
+And: - $p = 0.5$ (assumed proportion of voters for Kelly) - $n = 1648$ (sample size)
+
+```{r}
+p <- 0.5
+n <- 1648
+SE <- sqrt(p * (1 - p) / n)
+cat("Standard Error:", SE, "\n")
+```
+
+**Result:** The standard error is approximately **0.0123**.
+
+### b - Simulation Analysis
+
+```{r}
+set.seed(123)  
+simulations <- 10000
+sample_props <- rbinom(simulations, n, p) / n
+mean_sample_prop <- mean(sample_props)
+sd_sample_prop <- sd(sample_props)
+hist(sample_props, main = "Simulated Sampling Distribution of Proportion",
+     xlab = "Sample Proportion", breaks = 50, col = "lightblue")
+observed_prop <- 0.515
+is_surprising <- observed_prop > (mean_sample_prop + 2 * sd_sample_prop) || 
+                 observed_prop < (mean_sample_prop - 2 * sd_sample_prop)
+cat("Mean of Sample Proportions:", mean_sample_prop, "\n")
+cat("Standard Deviation of Sample Proportions:", sd_sample_prop, "\n")
+cat("Is the observed proportion surprising?:", is_surprising, "\n")
+```
+
+**Results:** - Mean of Sample Proportions: **0.5000** - Standard Deviation of Sample Proportions: **0.0123**
+
+The observed proportion of 51.5% is **not surprising**, as it falls within the expected range of the sampling distribution ($\pm 2$ standard deviations from the mean). It would be reasonable to predict that Kelly could win the election based on this exit poll, but with some caution due to the closeness of the result.
+
+### Exercise 3.16
+
+According to the U.S. Census Bureau, the number of people in a household has a mean of 2.6 and a standard deviation of 1.5. Suppose the Census Bureau instead had estimated this mean using a random sample of 225 homes, and that sample had a mean of 2.4 and standard deviation of 1.4. Describe the center and spread of:
+
+1.  **a**: The population distribution.
+2.  **b**: The sample data distribution.
+3.  **c**: The sampling distribution of the sample mean for 225 homes.
+
+*Solution*
+
+### a - Population Distribution
+
+$$
+\text{Mean: } \mu = 2.6
+$$ $$
+\text{Standard Deviation: } \sigma = 1.5
+$$
+
+### b - Sample Data Distribution
+
+$$
+\text{Sample Mean: } \bar{x} = 2.4
+$$ $$
+\text{Sample Standard Deviation: } s = 1.4
+$$
+
+### c - Sampling Distribution of the Sample Mean
+
+$$
+E(\bar{X}) = \mu = 2.6
+$$
+
+$$
+SE(\bar{X}) = \frac{\sigma}{\sqrt{n}}
+$$
+
+Where: $$
+\sigma = 1.5 \quad \text{(population standard deviation)}
+$$ $$
+n = 225 \quad \text{(sample size)}
+$$
+
+```{r}
+sigma <- 1.5
+n <- 225
+SE <- sigma / sqrt(n)
+cat("Standard Error of the Sample Mean:", SE, "\n")
+```
+
+**Results**: The standard error of the sample mean is approximately **0.1**.
+
+-   The **sampling distribution of the sample mean** the expected variability of the sample mean if we took multiple samples of 225 home and The standard error of 0.1 indicates that the sample mean is likely to be close to the population mean.
+
+### Ex 3.24
+
+*Construct a population distribution that is plausible for* $Y$ = number of alcoholic drinks in the past day.
+
+a)  *Simulate a single random sample of size* $n = 1000$ from this population to reflect results of a typical sample survey. Summarize how the sample mean and standard deviation resemble those for the population. (Alternatively, you can do this and part (b) using an app, such as the Sampling Distribution for the Sample Mean (Discrete Population) app at www.artofstat.com/web-apps using the Build Custom Distribution option.)
+b)  *Now draw* $10,000$ random samples of size $1000$ each, to approximate the sampling distribution of $Y$. Report the mean and standard deviation of this simulated sampling distribution, and compare to the theoretical values. Explain what this sampling distribution represents.
+
+**Solution**
+
+```{r}
+set.seed(123)
+
+lambda <- 1 # average number of drinks per day
+n <- 1000 # sample size
+
+sample_y <- rpois(n, lambda)
+
+sample_mean <- mean(sample_y)
+sample_sd <- sd(sample_y)
+```
+
+```{r echo=FALSE}
+cat("Sample Mean:", sample_mean, "\n")
+cat("Sample Standard Deviation:", sample_sd, "\n")
+```
+
+As we can see, both the sample mean and the sample standard deviation are rather close to the population mean and standard deviation (the real values are $\mu = 1$ and $\sigma = 1$, as both the mean and the variance are equal to $\lambda$, which is equal to $1$).
+
+Due to sampling variability, the sample statistics are slightly different from the population parameters.
+
+```{r}
+set.seed(123)
+
+num_samples <- 10000
+sample_means <- numeric(num_samples) # vector to store the means
+
+for(i in 1:num_samples) {
+  sample <- rpois(n, lambda)
+  sample_means[i] <- mean(sample)
+}
+
+samples_mean <- mean(sample_means)
+samples_sd <- sd(sample_means)
+```
+
+```{r echo=FALSE}
+cat("Mean of the Sampling Distribution:", samples_mean, "\n")
+cat("Standard Deviation of the Sampling Distribution:", samples_sd, "\n")
+```
+
+```{r echo=FALSE}
+hist(sample_means, breaks = 20, probability = T,
+     main = "Histogram of Sample Means with Normal Curve",
+     xlab = "Sample Mean")
+curve(dnorm(x, mean = lambda, sd = sqrt(lambda / n)), 
+      col = "darkred", lwd = 2, add = T)
+```
+
+In this case, the mean of the sampling distribution is much closer to the population mean, which is $1$.
+
+The standard deviation of the sampling distribution, on the other hand, should be close to the theoretical standard error of the mean, which is $\frac{\sigma}{\sqrt{n}} = \frac{\sqrt{\lambda}}{\sqrt{1000}} \simeq 0.0316$ for $\lambda = 1$. As we can see from the results, we got a standard deviation of $0.03156 \simeq 0.0316$, which is basically the same as the theoretical one.
+
+The sampling distribution represents the distribution of sample means for the samples taken from the population. It shows how much variability is expected in the sample mean if we repeatedly sampled from the population. According to the Central Limit Theorem, this distribution will be approximately normal, regardless of the shape of the original population distribution, especially for large n.
+
+## FSDS - Chapter 4
+
+### Ex 4.8
+
+*To estimate the proportion of traffic deaths in California last year that were alcohol related, determine the necessary sample size for the estimate to be accurate to within 0.04 with probability 0.90. Based on results of studies reported by the National Highway Traffic Safety Administration (www.nhtsa.gov), we expect the proportion to be about 0.30.*
+
+**Solution**
+
+```{r}
+
+confidence_level <- 0.90
+margin_of_error <- 0.04
+estimated_proportion <- 0.30
+
+# Z-value for 90% confidence level
+z_value <- qnorm(1 - (1 - confidence_level) / 2)
+
+n <- (z_value^2 * estimated_proportion * (1 - estimated_proportion)) / (margin_of_error^2)
+
+required_sample_size <- ceiling(n)
+
+required_sample_size
+
+```
+
+### Ex 4.14
+
+*Using the `Students` data file, construct a 95% confidence interval:*
+
+*- **a**: For the mean weekly number of hours spent watching TV.* *- **b**: To compare females and males on the mean weekly number of hours spent watching TV.*
+
+**Solution**
+
+Load Data
+
+```{r}
+library(dplyr)
+students_data <- read.table("Students.dat.txt", header = TRUE)
+head(students_data)
+```
+
+a - 95% Confidence Interval for Mean Weekly Hours Watching TV
+
+```{r}
+mean_tv <- mean(students_data$tv, na.rm = TRUE)
+sd_tv <- sd(students_data$tv, na.rm = TRUE)
+n_tv <- sum(!is.na(students_data$tv))
+
+error_margin <- qt(0.975, df = n_tv - 1) * (sd_tv / sqrt(n_tv))
+ci_lower <- mean_tv - error_margin
+ci_upper <- mean_tv + error_margin
+
+cat("95% Confidence Interval for mean weekly hours watching TV: [", ci_lower, ",", ci_upper, "]\n")
+```
+
+b - Comparison of Mean Weekly Hours Watching TV Between Females and Males
+
+```{r}
+females <- students_data %>% filter(gender == 1) %>% select(tv) %>% unlist()
+males <- students_data %>% filter(gender == 0) %>% select(tv) %>% unlist()
+
+mean_female <- mean(females, na.rm = TRUE)
+sd_female <- sd(females, na.rm = TRUE)
+n_female <- sum(!is.na(females))
+
+mean_male <- mean(males, na.rm = TRUE)
+sd_male <- sd(males, na.rm = TRUE)
+n_male <- sum(!is.na(males))
+
+se_diff <- sqrt((sd_female^2 / n_female) + (sd_male^2 / n_male))
+mean_diff <- mean_female - mean_male
+
+error_margin_diff <- qt(0.975, df = min(n_female, n_male) - 1) * se_diff
+ci_lower_diff <- mean_diff - error_margin_diff
+ci_upper_diff <- mean_diff + error_margin_diff
+
+cat("95% Confidence Interval for the difference in mean weekly hours watching TV (Females - Males): [", ci_lower_diff, ",", ci_upper_diff, "]\n")
+```
+
+the 95% confidence interval for the difference in mean weekly hours spent watching TV between females and males is [-2.09, 5.06]. Since this interval includes zero, means that there may not be a significant difference between the two groups.
+
+### Ex. 4.34
+
+*Using simulation, conduct an investigation of whether the sample mean or median is a better estimator of the common value for the mean and median of a uniform distribution.*
+
+**Solution**
+
+```{r}
+
+set.seed(123)     #Parameters are based on the 4.33 exercise
+n <- 100
+trials <- 100000
+true_value <- 0.5
+
+sample_means <- numeric(trials)
+sample_medians <- numeric(trials)
+
+
+for (i in 1:trials) {
+  # Generate a random sample from a uniform distribution U(0,1)
+  sample <- runif(n, min = 0, max = 1)
+  
+
+  sample_means[i] <- mean(sample)
+  sample_medians[i] <- median(sample)
+}
+
+
+mse_mean <- mean((sample_means - true_value)^2)
+mse_median <- mean((sample_medians - true_value)^2)
+
+mse_mean
+mse_median
+```
+
+## FSDS - Chapter 5
+
+### Ex. 5.8
+
+*Using the `Students` data file, analyze political ideology.*
+
+*- **a**: Test whether the population mean* $\mu$ differs from 4.0, the moderate response. Report the P-value and interpret the result, making a conclusion using $\alpha = 0.05$. *- **b**: Construct the 95% confidence interval for* $\mu$. Explain how results relate to those of the test in (a).
+
+**Solution**
+
+Load Data
+
+```{r}
+library(dplyr)
+students_data <- read.table("Students.dat.txt", header = TRUE)
+head(students_data)
+```
+
+a - Hypothesis Test for Mean Political Ideology
+
+```{r}
+# Null hypothesis ==== mean political ideology = 4.0
+# Alternative hypothesis = mean political ideology ≠ 4.0
+
+mean_ideol <- mean(students_data$ideol, na.rm = TRUE)
+sd_ideol <- sd(students_data$ideol, na.rm = TRUE)
+n_ideol <- sum(!is.na(students_data$ideol))
+t_test_result <- t.test(students_data$ideol, mu = 4.0, alternative = "two.sided")
+
+cat("P-value from the t-test:", t_test_result$p.value, "\n")
+```
+
+The P-value (2.48e-05) is much less than 0.05, indicating strong evidence to reject the null hypothesis. the population mean significantly differs from 4.0.
+
+b - 95% Confidence Interval for Mean Political Ideology
+
+```{r}
+error_margin_ideol <- qt(0.975, df = n_ideol - 1) * (sd_ideol / sqrt(n_ideol))
+ci_lower_ideol <- mean_ideol - error_margin_ideol
+ci_upper_ideol <- mean_ideol + error_margin_ideol
+
+cat("95% Confidence Interval for mean political ideology: [", ci_lower_ideol, ",", ci_upper_ideol, "]\n")
+```
+
+The interval [2.61, 3.46] does not include 4.0, reinforcing and confirming the conclusion from the hypothesis test : the population mean differs from 4.0. The confidence interval [2.61, 3.46] does not include 4.0, confirming the hypothesis test result (P-value: 2.48e-05) that : mean significantly differs from 4.0. Both methods consistently indicate that the true mean is below 4.0.
+
+### Ex. 5.50
+
+*A random sample of size 40 has y = 120. The P -value for testing H0: µ = 100 against Ha: µ ≠ 100 is 0.057. Explain what is incorrect about each of the following interpretations of this P -value, and provide a proper interpretation.*
+
+(a)*The probability that H0 is correct equals 0.057.*
+
+(b)*The probability that y = 120 if H0 is true equals 0.057.*
+
+(c)*The probability of Type I error equals 0.057.*
+
+(d)*We can accept H0 at the α = 0.05 level.*
+
+**Solution**
+
+(a) The probability that $H_0$ is True is 0.057.
+
+Why this is incorrect: A $P$-value does not indicate the likelihood of $H_0$ being True. It only indicates how surprising our results are, assuming $H_0$ is True.
+
+Correct interpretation: If $H_0$ (mean = 100) is True, there is a 5.7% chance of obtaining a sample mean as extreme as 120.
+
+(b) The probability of obtaining $y = 120$ if $H_0$ is True is 0.057.
+
+Why this is incorrect: A $P$-value does not represent the probability of observing any specific sample mean, such as exactly 120. It reflects how extreme our result is under the null hypothesis.
+
+Correct interpretation: Assuming $H_0$ is True, there is a 5.7% chance of getting a sample mean as extreme as 120 or further away from 100 in either direction.
+
+(c) The probability of committing a Type I error is 0.057.
+
+Why this is incorrect: A Type I error occurs when we reject $H_0$ when it is actually True. The probability of making a Type I error is determined by the significance level $\alpha$ (usually set at 0.05) before the test begins.
+
+Correct interpretation: The $P$-value indicates how much the data contradicts $H_0$. Since 0.057 is greater than 0.05, it does not provide sufficient evidence to reject $H_0$ at the 5% significance level.
+
+(d) We can accept $H_0$ at the $\alpha = 0.05$ level.
+
+Why this is incorrect: Failing to reject $H_0$ does not imply that we accept it as True; it means we lack enough evidence to dispute it.
+
+Correct interpretation: With a $P$-value of 0.057 (above 0.05), we "fail to reject" $H_0$ at the 5% significance level. This indicates we do not have strong enough evidence to claim the True mean differs from 100.
+
+### Ex.5.58
+
+*A researcher conducts a significance test every time she analyzes a new data set. Over time, she conducts 100 significance tests, each at the 0.05 level. If H0 is true in every case, what is the probability distribution of the number of times she rejects H0, and how many times would we expect h0 to be rejected?*
+
+**Solution**
+
+```{r}
+
+library(ggplot2)  
+
+n <- 100  
+
+p <- 0.05  
+
+prob_dist <- dbinom(0:n, n, p)  
+
+expected_rejections <- n * p  
+
+df <- data.frame(Rejections = 0:n, Probability = prob_dist)  
+
+ggplot(df, aes(x = Rejections, y = Probability)) +  
+  geom_bar(stat = "identity", fill = "blue") +  
+  labs(x = "Number of Rejections", y = "Probability",  
+       title = "Probability Distribution of the Number of Times H0 is Rejected") +  
+  theme_minimal()  
+
+cat("Expected number of times H0 is rejected:", expected_rejections, "\n")
+```
+
+## CS - Chapter 1
+
+### Ex 1.1
+
+*Exponential random variable,* $X \geq 0$, has p.d.f. $f(x) = \lambda \exp(-\lambda x)$. *1. Find the c.d.f. and the quantile function for* $X$. *2. Find* $Pr(X < \lambda)$ and the median of X. *3. Find the mean and variance of* $X$.
+
+**Solution**
+
+1.  The p.d.f. of the exponential distribution is
+
+$$f(x) = \begin{cases} 
+\lambda \exp(-\lambda x) & x \geq 0, \\
+0 & x < 0 
+\end{cases}$$ Therefore, by definition the c.d.f is $$ F(x) = \int_{-\infty}^{x} f(t) \, dt = \int_{0}^{x} \lambda e^{-\lambda t} \, dt = \begin{cases} 
+1 - e^{-\lambda x} & x \geq 0, \\
+0 & x < 0 
+\end{cases}  $$.
+
+The quantile, instead, is defined as the smallest $x$ such that $$F(x) = p$$. So $$p = 1 - exp(-\lambda x)$$ that implies $$x =   -\frac{\ln(1 - p)}{\lambda}$$.
+
+2.  $Pr(X < \lambda) = F(\lambda) = 1 - exp(-\lambda^2)$
+
+3.  Mean: since the expected value is defined as $$E(X) = \int_{\mathbb{R}} x f(x) dx$$,\
+    in this case we obtain $$E(X) = \int_{\mathbb{R}} \lambda x \exp(-\lambda x) dx = \int_{0}^{+\infty} \lambda x \exp(-\lambda x) dx =    \lambda \left[ \left( -\frac{1}{\lambda} x - \frac{1}{\lambda^2} \right) \exp(-\lambda x) \right]_{0}^{+\infty} \\
+    = \lambda \left[ \lim_{x \to +\infty} \left( -\frac{1}{\lambda} x - \frac{1}{\lambda^2} \right) \exp(-\lambda x) - \left( -\frac{1}{\lambda} \cdot 0 - \frac{1}{\lambda^2} \right) \exp(-\lambda \cdot 0) \right] \\
+    = \lambda \left[ 0 + \frac{1}{\lambda^2} \right] \\
+    = \frac{1}{\lambda}.
+    $$
+
+Variance: one way to compute the variance is through this formula $$Var(X) = E[X^2] - E[X]^2$$. $E[X]$ is already computed in the previous point. The second moment $E[X^2]$ is computed as follows $$E[X^2] = \int_{-\infty}^{+\infty} x^2 \cdot f_X(x) \, dx \\
+= \int_{0}^{+\infty} x^2 \cdot \lambda \exp(-\lambda x) \, dx \\
+= \lambda \int_{0}^{+\infty} x^2 \cdot \exp(-\lambda x) \, dx
+= \lambda \left[ \left( -\frac{x^2}{\lambda} - \frac{2x}{\lambda^2} - \frac{2}{\lambda^3} \right) \exp(-\lambda x) \right]_{0}^{+\infty} \\
+= \lambda \left[ \lim_{x \to +\infty} \left( -\frac{x^2}{\lambda} - \frac{2x}{\lambda^2} - \frac{2}{\lambda^3} \right) \exp(-\lambda x) - \left( 0 - 0 - \frac{2}{\lambda^3} \right) \exp(-\lambda \cdot 0) \right] \\
+= \lambda \left[ 0 + \frac{2}{\lambda^3} \right] \\
+= \frac{2}{\lambda^2}. $$ Eventually, substituting these two quantities into the first formula, we have $$Var(X) = E[X^2] - E[X]^2 = \frac{2}{\lambda^2} - (\frac{1}{\lambda})^2 = \frac{1}{\lambda^2}.$$
+
+### Ex 1.6
+
+*Let X and Y be non-independent random variables, such that* $Var(X) = \sigma_{x}^2$, $Var(X) = \sigma_{y}^2$ *and* $Cov(X,Y) = \sigma_{xy}^2$. Using the result from Section 1.6.2, find $Var(X+Y)$ and $Var(X-Y)$.
+
+**Solution** We define the $1\times 2$ matrix $A = (1, 1)$ to write $$X + Y = A \begin{pmatrix} 
+      X \\ Y 
+    \end{pmatrix} = \begin{pmatrix} 1 & 1
+    \end{pmatrix} 
+    \begin{pmatrix} 
+      X \\ Y 
+    \end{pmatrix}$$ Using the formula of the variance matrix given in section 1.6.2 we obtain $$\mathrm{Var}(X + Y) = A \begin{pmatrix} \mathrm{Var}(X) & \mathrm{Cov}(X,Y) \\ \mathrm{Cov}(X,Y) & \mathrm{Var}(Y) \end{pmatrix} A^T \\
+  = \begin{pmatrix} 1 & 1\end{pmatrix} \begin{pmatrix} \sigma_x^2 & \sigma_{xy}^2 \\ \sigma_{xy}^2 & \sigma_y^2 \end{pmatrix} \begin{pmatrix} 1 \\ 1 \end{pmatrix} = \sigma_x^2 + \sigma_y^2 + 2\sigma_{xy}^2.$$ Using the matrix $(1, -1)$ we obtain the covariance of the difference: $$\mathrm{Var}(X - Y) = \sigma_x^2 + \sigma_y^2 - 2\sigma_{xy}^2.$$
+
+## CS - Chapter 3
+
+### Ex. 3.5
+
+*Consider solving the matrix equation* $Ax = y$ *for* $x$ *where* $y$ *is a known n vector and A is a known* $n\times n$ *matrix. The formal solution to the problem is* $x=A^{-1}y$ *but it is possible to solve the equation directly without actually forming* $A^{-1}.$ *This question explores this direct solution. Read the help file for* `solve` *before trying it*
+
+a.*First create an* $A,x$ *and* $y$ *satisfying* $Ax = y$.
+
+```{r}
+set.seed(0); n <- 1000
+A <- matrix(runif(n*n), n, n); x.true <- runif(n)
+y <- A%*%x.true
+```
+
+*The idea is to experiment with solving* $Ax=y$ *for* $x$ *but with a known truth to compare the answer to.* b.*Using* `solve`*, form the matrix* $A^{-1}$ *explicitly and then form* $x_1=A^{-1}y$*, note how long it takes. Also asses the mean absolute difference between* `x1` *and* `x.true` *(the approximate mean absolute 'error' in the solution)*
+
+```{r}
+A_inv <- solve(A);
+x1 <- A_inv %*% y;
+MAE_1 <- sum(abs(x1 - x.true))/n
+MAE_1
+```
+
+c.*Now use* `solve` *to directly solve for* $x$ *without forming* $A^{-1}$*. Note how long it takes and asses the mean absolute error for the result*
+
+```{r}
+x2 <- solve(A, y);
+MAE_2 <- sum(abs(x1 - x.true))/n
+MAE_2
+```
+
+d.*What do you conclude? The first case takes longer than the second one, but the MAE is the same. Therefore there is no reason to compute* $A^{-1}$ *entirely if we want to solve the linear system.*
+
+### Ex 3.6
+
+*The empirical cumulative distribution function for a set of measurements* $\{x_i : i=1,\ldots,n \}$ *is* $$\hat{F}(x) = \frac{\#\{x_i < x\}}{n}$$ *where* $\#\{x_i < x\}$ *denotes 'number' of* $x_i$ *values less than* $x$*'. When answering the following, try to ensure that your code is commented, clearly structured and tested. To test your code generate random samples using* `rnorm`, `runif` *etc.* a.*Write an R function that takes an ordered vector of observations* $x$ *and returns the values of the empirical CDF for each value, in the other corresponding to the original* $x$ *vector.*
+
+```{r}
+set.seed(123);
+n <- 10;
+x <- rnorm(n)
+
+ecdf_ex <- function(x) {
+  # Sort the input vector and get the unique values
+  sorted_x <- sort.int(x)
+  unique_x <- unique(sorted_x)
+  
+  # Initialize a vector to hold ecdf values
+  ecdf_values <- c(length(x))
+  
+  # Calculate the ecdf for each unique value
+  for (value in unique_x) {
+    # Count how many values are less than or equal to the current value
+    count <- sum(sorted_x < value)
+    # Assign the ecdf value to the corresponding indices in the original vector (which is a boolean)
+    ecdf_values[which(x == value)] <- count / length(x)
+  }
+  
+  return(ecdf_values)
+}
+
+#test
+ecdf_result <- ecdf_ex(x)
+x
+ecdf_result
+
+
+
+```
+
+b.*Modify your function to take an extra argument* `plot.cdf` *that when True, will cause the empirical cdf to be plotted as a step function over a suitable* $x$ *range.*
+
+```{r}
+ecdf_ex <- function(x, plot.cdf = FALSE) {
+  sorted_x <- sort(x)
+  n <- length(x)
+    ecdf_values <- sapply(x, function(val) sum(sorted_x <= val) / n)
+  
+  if (plot.cdf) {
+    plot(sorted_x, ecdf_values, type = "s", col = "blue",
+         main = "Empirical CDF", xlab = "x", ylab = "Empirical CDF",
+         xlim = range(sorted_x), ylim = c(0, 1))
+    grid()
+  }
+  
+  return(ecdf_values)
+}
+set.seed(123)
+n <- 10
+x <- rnorm(n)
+ecdf_result <- ecdf_ex(x, plot.cdf = TRUE)
+print(x)
+print(ecdf_result)
+```
